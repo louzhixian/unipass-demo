@@ -7,12 +7,12 @@
         <q-btn class="full-width" color="primary" type="submit" icon="login" label="Login" @click="login" />
       </q-card-section>
       <q-separator spaced />
-      <q-card-section class="q-gutter-sm">
+      <!-- <q-card-section class="q-gutter-sm">
         <div class="row"><q-input class="full-width" v-model="toAddress" type="text" label="TO:" /></div>
         <div class="row"><q-input class="full-width" v-model="toAmount" type="number" suffix=" CKB" /></div>
         <q-btn class="full-width" color="info" icon="send" label="Send" @click="send" />
         <div class="row" style="word-break:break-all;"><b>TX:</b> <a :href="`https://explorer.nervos.org/aggron/transaction/${txHash}`">{{ txHash }}</a></div>
-      </q-card-section>
+      </q-card-section> -->
       <q-separator spaced />
       <q-card-section class="q-gutter-sm">
         <div class="row"><q-input class="full-width" v-model="message" type="text" label="Message" /></div>
