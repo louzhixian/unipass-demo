@@ -56,7 +56,7 @@ export default class UnipassProvider extends Provider {
       };
 
       window.addEventListener('message', this.msgHandler, false);
-      window.open(this.UNIPASS_BASE + '/#/login');
+      this.openWindow('login');
     });
   }
 
@@ -87,11 +87,28 @@ export default class UnipassProvider extends Provider {
       };
 
       window.addEventListener('message', this.msgHandler, false);
-      window.open(this.UNIPASS_BASE + '/#/sign');
+      this.openWindow('sign');
     });
   }
   close() {
     this.msgHandler && window.removeEventListener('message', this.msgHandler);
+  }
+  openWindow(title: string) {
+    window.open(
+      `${this.UNIPASS_BASE}/#/${title}`,
+      title,
+      `toolbar=no,
+      location=no,
+      status=no,
+      menubar=no,
+      scrollbars=yes,
+      resizable=yes,
+      top=30,
+      left=20,
+      width=360,
+      height=640`
+    );
+    return false;
   }
 }
 
