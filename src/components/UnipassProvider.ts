@@ -7,6 +7,7 @@ import {
   Provider,
   Script
 } from '@lay2/pw-core';
+import { createHash } from 'crypto';
 
 type UP_ACT = 'UP-READY' | 'UP-LOGIN' | 'UP-SIGN' | 'UP-CLOSE';
 
@@ -44,7 +45,7 @@ export default class UnipassProvider extends Provider {
               (event.source as Window).postMessage(msg, event.origin);
           } else if (msg.upact === 'UP-LOGIN') {
             const { pubkey, email } = msg.payload as UnipassAccount;
-            const ckbAddress = await pubkeyToAddress(pubkey);
+            const ckbAddress = pubkeyToAddress(pubkey);
             this.address = new Address(ckbAddress, AddressType.ckb);
             this._email = email;
             this.msgHandler &&
@@ -62,6 +63,8 @@ export default class UnipassProvider extends Provider {
 
   sign(message: string): Promise<string> {
     console.log('[UnipassProvider] message to sign', message);
+    // message = createHash('SHA256').update(message).digest('hex').toString();
+    // console.log('[UnipassProvider] message hash', message);
     return new Promise(resolve => {
       this.msgHandler = event => {
         if (typeof event.data === 'object' && 'upact' in event.data) {
@@ -112,11 +115,11 @@ export default class UnipassProvider extends Provider {
   }
 }
 
-async function pubkeyToAddress(pubkey: string): Promise<string> {
-  const msgUint8 = new TextEncoder().encode(pubkey); // encode as (utf-8) Uint8Array
-  const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8); // hash the message
-  const hashArray = Array.from(new Uint8Array(hashBuffer)); // convert buffer to byte array
-  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join(''); // convert bytes to hex string
+function pubkeyToAddress(pubkey: string): string {
+  const pubKeyBuffer = Buffer.from(pubkey.replace('0x',''), 'hex');
+  const hashHex = '0x' + createHash('SHA256').update(pubKeyBuffer).digest('hex').toString().slice(0, 40);
+  // console.log('hashHex', hashHex);
+
   const script = new Script(
     '0x6843c5fe3acb7f4dc2230392813cb9c12dbced5597fca30a52f13aa519de8d33',
     hashHex,
