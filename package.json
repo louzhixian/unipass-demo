@@ -10,7 +10,7 @@
     "test": "echo \"No test specified\" && exit 0"
   },
   "dependencies": {
-    "@lay2/pw-core": "^0.3.22",
+    "@lay2/pw-core": "0.4.0-alpha.6",
     "@quasar/extras": "^1.0.0",
     "@vue/composition-api": "^1.0.0-rc.3",
     "axios": "^0.21.1",
@@ -19,6 +19,7 @@
   },
   "devDependencies": {
     "@quasar/app": "^2.0.0",
+    "@types/elliptic": "^6.4.12",
     "@types/node": "^10.17.15",
     "@typescript-eslint/eslint-plugin": "^4.16.1",
     "@typescript-eslint/parser": "^4.16.1",

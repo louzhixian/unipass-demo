@@ -24,13 +24,16 @@
 </template>
 
 <script lang="ts">
-import PWCore, { Amount, PwCollector } from '@lay2/pw-core';
+import PWCore, { Amount, IndexerCollector } from '@lay2/pw-core';
 import { defineComponent, ref } from '@vue/composition-api';
 import UnipassProvider from 'src/components/UnipassProvider';
 import UnipassBuilder from 'src/components/UnipassBuilder';
 import UnipassSigner from 'src/components/UnipassSigner';
 import { createHash } from 'crypto';
-import { RPC, transformers } from 'ckb-js-toolkit';
+
+const NODE_URL = 'https://testnet.ckb.dev';
+const INDEXER_URL = 'https://testnet.ckb.dev/indexer';
+const UNIPASS_URL = 'https://unipass.vercel.app'
 
 export default defineComponent({
   name: 'PageIndex',
@@ -41,37 +44,23 @@ export default defineComponent({
     const toAddress = ref('');
     const toAmount = ref(0);
     const txHash = ref('');
-    const pw = ref<PWCore>();
-    return { pw, provider, toAddress, toAmount, txHash, message, signature };
+    return { provider, toAddress, toAmount, txHash, message, signature };
   },
   methods: {
     async login() {
-      this.pw = await new PWCore('https://testnet.ckb.dev').init(
-        // new UnipassProvider('http://localhost:8080'),
-        new UnipassProvider(),
-        new PwCollector('https://cellapitest.ckb.pw')
+      await new PWCore(NODE_URL).init(
+        new UnipassProvider(UNIPASS_URL),
+        new IndexerCollector(INDEXER_URL)
       );
       this.provider = PWCore.provider as UnipassProvider;
-      console.log('UnipassProvider inited', this.pw.rpc); 
     },
     async send() {
       try{
-        if(!this.provider || !this.pw) throw new Error('Need Login');
+        if(!this.provider) throw new Error('Need Login');
         const builder = new UnipassBuilder(this.provider.address, new Amount(`${this.toAmount}`))
         const signer = new UnipassSigner(this.provider);
+        this.txHash = await new PWCore(NODE_URL).sendTransaction(builder, signer)
 
-        // copy code from pw-core to replace this.pw.sendTransaction(builder, signer)
-        const tx = await builder.build();
-        tx.validate();
-        const signedTx = await signer.sign(tx);
-        console.log('signedTx', signedTx);
-        const formatedTx = transformers.TransformTransaction(signedTx);
-        console.log('formatedTx', JSON.stringify(formatedTx));
-        console.log('rpc', this.pw.rpc);
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        this.txHash = await new RPC('https://testnet.ckb.dev').send_transaction(formatedTx);
-
-        // this.txHash = await this.pw.sendTransaction(builder, signer);
         console.log('this.txHash', this.txHash);
       }catch(err){
         console.error(err);

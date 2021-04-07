@@ -36,7 +36,7 @@ export default class UnipassProvider extends Provider {
 
   async init(): Promise<UnipassProvider> {
     return new Promise(resolve => {
-      this.msgHandler = async event => {
+      this.msgHandler = event => {
         if (typeof event.data === 'object' && 'upact' in event.data) {
           const msg = event.data as UnipassMessage;
           if (msg.upact === 'UP-READY') {
@@ -116,8 +116,14 @@ export default class UnipassProvider extends Provider {
 }
 
 function pubkeyToAddress(pubkey: string): string {
-  const pubKeyBuffer = Buffer.from(pubkey.replace('0x',''), 'hex');
-  const hashHex = '0x' + createHash('SHA256').update(pubKeyBuffer).digest('hex').toString().slice(0, 40);
+  const pubKeyBuffer = Buffer.from(pubkey.replace('0x', ''), 'hex');
+  const hashHex =
+    '0x' +
+    createHash('SHA256')
+      .update(pubKeyBuffer)
+      .digest('hex')
+      .toString()
+      .slice(0, 40);
   // console.log('hashHex', hashHex);
 
   const script = new Script(
